@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>WHONUM — Banner Concept</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #060606;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Courier New', Courier, monospace;
+    color: #00ff88;
+  }
+  .wrapper {
+    padding: 60px 80px;
+    border: 1px solid rgba(0,255,136,0.3);
+    background: radial-gradient(ellipse at center, #001a0e 0%, #060606 70%);
+    box-shadow:
+      0 0 60px rgba(0,255,136,0.08),
+      inset 0 0 60px rgba(0,255,136,0.03);
+    text-align: center;
+    max-width: 860px;
+    width: 90%;
+  }
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 8px;
+    color: #2a6648;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .name {
+    font-size: 112px;
+    font-weight: 900;
+    letter-spacing: 24px;
+    line-height: 1;
+    color: #00ff88;
+    text-shadow:
+      0 0 40px rgba(0,255,136,0.5),
+      0 0 80px rgba(0,255,136,0.2),
+      0 0 120px rgba(0,255,136,0.1);
+  }
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(0,255,136,0.4), transparent);
+    margin: 32px 0;
+  }
+  .tagline {
+    font-size: 13px;
+    letter-spacing: 5px;
+    color: #4a9970;
+    text-transform: uppercase;
+  }
+  .quote {
+    font-size: 16px;
+    color: rgba(0,255,136,0.5);
+    font-style: italic;
+    margin-top: 20px;
+    letter-spacing: 1px;
+  }
+  .brand {
+    margin-top: 36px;
+    font-size: 10px;
+    letter-spacing: 6px;
+    color: #1a3326;
+    text-transform: uppercase;
+  }
+  /* Corner decorations */
+  .corner {
+    position: absolute;
+    font-size: 10px;
+    color: rgba(0,255,136,0.15);
+    letter-spacing: 2px;
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <p class="eyebrow">CobraSEC · Offensive Security</p>
+  <h1 class="name">WHONUM</h1>
+  <div class="divider"></div>
+  <p class="tagline">Phone OSINT &nbsp;·&nbsp; Number Intelligence &nbsp;·&nbsp; Caller ID</p>
+  <p class="quote">"Who's calling? We'll tell you."</p>
+  <p class="brand">CobraSEC — WDNL</p>
+</div>
+</body>
+</html>
