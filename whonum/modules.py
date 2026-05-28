@@ -369,19 +369,12 @@ async def check_numverify(client: httpx.AsyncClient, intel: dict) -> dict:
 ALL_MODULES = [
     # Platform presence
     check_whatsapp,
-    check_telegram,
-    check_viber,
     # Spam / scam / robocall databases
     check_nomorobo,
     check_whocalledme,
-    check_shouldianswer,
     check_800notes,
     check_spamcalls,
-    check_callercenter,
     check_hiya,
-    check_truecaller,
-    # Carrier / line intelligence
-    check_numlookup,
     # Optional API-key sources (skipped if key not set)
     check_ipqs,
     check_abstract,
