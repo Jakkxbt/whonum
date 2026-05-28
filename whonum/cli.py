@@ -48,7 +48,7 @@ def main(number, region, as_json, timeout, no_banner):
         return
 
     # Filter API-key-required sources that have no key set
-    display = [r for r in results if not (r["found"] is None and r.get("error", "").startswith("set "))]
+    display = [r for r in results if not (r["found"] is None and (r.get("error") or "").startswith("set "))]
 
     found = [r for r in display if r["found"] is True]
     not_found = [r for r in display if r["found"] is False]
