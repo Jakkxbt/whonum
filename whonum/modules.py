@@ -38,16 +38,17 @@ async def check_whatsapp(client: httpx.AsyncClient, intel: dict) -> dict:
     name = "WhatsApp"
     digits = intel["e164_digits"]
     url = f"https://wa.me/{digits}"
+    # wa.me only builds a click-to-chat deep link — it does NOT verify that a
+    # number is registered. Any well-formed number renders the same landing
+    # page, so reporting "found" here is a false positive. We can only surface
+    # an explicitly malformed number; registration must be confirmed in-app.
     try:
         r = await client.get(url, headers=HEADERS, timeout=12)
         text = r.text.lower()
-        if any(x in text for x in ["invalid", "link you've tried", "not available", "doesn't exist"]):
-            return _r(name, url, False, "not on WhatsApp")
-        if any(x in text for x in ["open whatsapp", "send message", "whatsapp.com/dl", "api.whatsapp.com"]):
-            return _r(name, url, True, f"active — {url}")
-        if r.status_code == 200 and "whatsapp" in text:
-            return _r(name, url, True, f"active — {url}")
-        return _r(name, url, None, None, f"status {r.status_code}")
+        if any(x in text for x in ["phone number shared via url is invalid",
+                                   "link you've tried", "url is invalid"]):
+            return _r(name, url, False, "invalid number")
+        return _r(name, url, None, f"manual check only: {url}")
     except Exception as e:
         return _r(name, url, None, None, str(e)[:60])
 
@@ -374,7 +375,8 @@ ALL_MODULES = [
     check_whocalledme,
     check_800notes,
     check_spamcalls,
-    check_hiya,
+    # check_hiya removed: hiya.com is a JS app; raw-HTML keyword scraping
+    # matched the page shell and returned a false "flagged" for every number.
     # Optional API-key sources (skipped if key not set)
     check_ipqs,
     check_abstract,

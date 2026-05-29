@@ -31,17 +31,35 @@ whonum +447700900000 --json > result.json
 - Country, region, timezone
 - Line type (Mobile/Fixed/VoIP)
 - Carrier (where available)
-- WhatsApp presence check
-- Spam database reports (WhoCalledMe, ShouldIAnswer, 800notes)
-- Truecaller name lookup attempt
+- Spam database reports (NoMoRobo, WhoCalledMe, 800notes, SpamCalls)
+- **SIM-farm / virtual-number risk assessment** (see below)
+
+## SIM-farm detection
+
+Every lookup produces a scored SIM-farm / virtual-number risk verdict
+(`CLEAN` / `LOW` / `ELEVATED` / `HIGH`) with the signals behind it. It combines:
+
+- **Offline (works for every number, no key):** VoIP line type from
+  libphonenumber, and carrier matched against a list of known CPaaS/VoIP
+  providers (Twilio, Bandwidth, Telnyx, Vonage, etc.).
+- **Online when keyed (IPQS):** prepaid, recent abuse, fraud score, VoIP flag.
+- **Spam clustering:** reports across multiple spam databases.
+
+Scope: this flags VoIP / virtual / CPaaS numbers and spam-clustered numbers —
+the profile of most spoofing, OTP-resale and SIM-box-adjacent abuse. A SIM farm
+built on genuine prepaid mobile SIMs can still look like a clean mobile line
+offline; catching those needs a line-intel API (IPQS prepaid + recent-abuse).
+Treat the verdict as a risk indicator, not proof.
 
 ## Optional API Keys (env vars)
 
 ```bash
-export NUMVERIFY_KEY=your_key   # numverify.com free tier: 100/month
-export NUMLOOKUP_KEY=your_key   # numlookupapi.com free tier
+export IPQS_KEY=your_key             # ipqualityscore.com free: 200/month — strongest signal
+export ABSTRACT_PHONE_KEY=your_key   # abstractapi.com free: 250/month
+export NUMVERIFY_KEY=your_key        # numverify.com free: 100/month
 ```
 
 ## Sources
 
-WhatsApp, Truecaller, WhoCalledMe, ShouldIAnswer, 800notes, NumLookup, Numverify (optional)
+WhatsApp (deep-link only), NoMoRobo, WhoCalledMe, 800notes, SpamCalls,
+IPQualityScore / AbstractAPI / Numverify (optional, API key)

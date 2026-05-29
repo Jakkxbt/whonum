@@ -9,6 +9,7 @@ from . import __version__
 from .intel import parse_number
 from .engine import scan
 from .modules import ALL_MODULES, SOURCE_NAMES
+from .assessment import assess
 
 console = Console()
 
@@ -42,9 +43,10 @@ def main(number, region, as_json, timeout, no_banner):
         console.print(f"[dim]Checking {len(ALL_MODULES)} sources...[/dim]\n")
 
     results = asyncio.run(scan(intel, timeout=timeout))
+    risk = assess(intel, results)
 
     if as_json:
-        click.echo(json.dumps({"intel": intel, "results": results}, indent=2))
+        click.echo(json.dumps({"intel": intel, "results": results, "sim_farm": risk}, indent=2))
         return
 
     # Filter API-key-required sources that have no key set
@@ -73,26 +75,21 @@ def main(number, region, as_json, timeout, no_banner):
     if table.row_count:
         console.print(table)
 
-    # Threat assessment
-    spam_hits = len([r for r in found if r["name"] in (
-        "NoMoRobo", "WhoCalledMe", "ShouldIAnswer", "800notes",
-        "SpamCalls", "CallerCenter", "Hiya", "IPQualityScore"
-    )])
-    voip_flag = any("VOIP" in (r.get("detail") or "") for r in found)
-    line_type = intel.get("type", "")
-
-    if spam_hits >= 3 or (spam_hits >= 1 and voip_flag):
-        threat = Text("⚠  HIGH RISK — likely spam/scam operation or SIM farm", style="bold red")
-    elif spam_hits >= 1:
-        threat = Text("⚡ SUSPICIOUS — reported in spam database(s)", style="bold yellow")
-    elif voip_flag or "VoIP" in line_type:
-        threat = Text("⚡ CAUTION — VoIP / virtual number", style="yellow")
-    else:
-        threat = Text("✓  No threat signals found", style="dim green")
-
-    console.print(f"\n  {threat}\n")
+    # SIM-farm / virtual-number risk assessment
+    style_map = {
+        "HIGH": "bold red", "ELEVATED": "bold yellow",
+        "LOW": "yellow", "CLEAN": "dim green",
+    }
+    icon_map = {"HIGH": "⚠", "ELEVATED": "⚡", "LOW": "•", "CLEAN": "✓"}
+    rstyle = style_map.get(risk["level"], "dim")
     console.print(
-        f"  [bold green]{len(found)} hits[/bold green]  "
+        f"\n  {Text(icon_map[risk['level']] + '  SIM-FARM RISK: ' + risk['level'], style=rstyle)}"
+    )
+    console.print(f"  [{rstyle}]{risk['label']}[/{rstyle}] [dim](score {risk['score']}/100)[/dim]")
+    for s in risk["signals"]:
+        console.print(f"    [dim]·[/dim] {s}")
+    console.print(
+        f"\n  [bold green]{len(found)} hits[/bold green]  "
         f"[dim]{len(not_found)} clean  {len(unknown)} unknown[/dim]\n"
     )
 
